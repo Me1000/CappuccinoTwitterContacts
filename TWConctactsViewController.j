@@ -322,12 +322,13 @@
 		
 		for(var i = 0, count = myJSObject.users.length; i < count; i++)
 		{
-			var item = myJSObject.users[i].
-    		    nameComponents = [item.name componentsSeparatedByString:" "].
+            var item = myJSObject.users[i],
+    		    nameComponents = [item.name componentsSeparatedByString:" "],
     		    lastComponent,// = [[nameComponents lastObject] uppercaseString];
-    		    firstLetter;// = [lastComponent substringToIndex:1];
-    		
-    		for (var nameComponentIndex = [nameComponents count] - 1; nameComponentIndex >= 0; nameComponentIndex--)
+    		    firstLetter,// = [lastComponent substringToIndex:1];
+    		    nameComponentIndex = [nameComponents count] - 1;
+            
+    		for (; nameComponentIndex >= 0; nameComponentIndex--)
     		{
                 lastComponent = [[nameComponents objectAtIndex:nameComponentIndex] uppercaseString];
                 firstLetter = [lastComponent substringToIndex:1];
@@ -366,7 +367,7 @@
         nameDescriptor = [[CPSortDescriptor alloc] initWithKey:@"lastComponent" ascending:YES],
         sortDescriptors = [CPArray arrayWithObject:nameDescriptor],
         aSortedArray = [ ],
-        allKeys = [[sortedDict allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:),
+        allKeys = [[sortedDict allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)],
         i = 0,
         c = [allKeys count];
     
@@ -381,15 +382,15 @@
             continue;
         }
         var aGroup = [sortedDict objectForKey:firstLetter],
-            aSortedGroupd = [aGroup sortedArrayUsingDescriptors:sortDescriptors],
+            aSortedGroup = [aGroup sortedArrayUsingDescriptors:sortDescriptors],
             groupStartPosition = [aSortedArray count],
             isGroupEmpty = YES,
             groupIndex = 0,
-            groupCount = [aSortedGroupd count];
+            groupCount = [aSortedGroup count];
             
         for(; groupIndex < groupCount; groupIndex++)
         {
-            var item = [aSortedGroupd objectAtIndex:groupIndex];
+            var item = [aSortedGroup objectAtIndex:groupIndex];
 
             if (isSearching)
             {

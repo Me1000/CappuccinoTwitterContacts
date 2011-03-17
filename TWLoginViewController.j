@@ -19,40 +19,39 @@
 {
 	var contentView = [[CPView alloc] initWithFrame:CGRectMake(0,0,330,190)];
     [contentView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
-    
-    
+
 	loginView = [[CPView alloc] initWithFrame:CGRectMake(5,5,320,180)];
     [loginView setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
     [contentView addSubview:loginView];
-    
+
     userLable = [CPTextField labelWithTitle:@"Welcome!"];
     [userLable setFrame:CGRectMake(0, 20, 320, 30)];
 	[userLable setFont:[CPFont boldSystemFontOfSize:20]];
 	[userLable setTextColor:[CPColor colorWithHexString:@"ccc"]];
 	[userLable setValue:CPCenterTextAlignment forThemeAttribute:@"alignment"];
     [loginView addSubview:userLable];
-        
+
     userTextField = [CPTextField textFieldWithStringValue:"" placeholder:"Twitter Screenname" width:100];
     [userTextField setFrame:CGRectMake(60, 55, 200, 30)];
     [loginView addSubview:userTextField];
-    
+
     activityIndicator = [[EKActivityIndicatorView alloc] initWithFrame:CGRectMake(265, 61, 18, 18)];
 	[loginView addSubview:activityIndicator];
-    
+
     rememberCheckBox = [CPCheckBox checkBoxWithTitle:@"Remember me"];
     [rememberCheckBox setFrame:CGRectMake(64, 90, 130, 24)];
     [loginView addSubview:rememberCheckBox];
-    	
-            
+
+
     preButton = [CPButton buttonWithTitle:@"Sign In"];
     [preButton setFrame:CGRectMake(197, 90, 60, 24)];
     [preButton setAction:@selector(loginAction:)];
     [preButton setTarget:self];
-    [preButton setKeyEquivalent:CPNewlineCharacter]
+    [preButton setKeyEquivalent:CPNewlineCharacter];
     [loginView addSubview:preButton];
-    	
+
     [self setView:contentView];
-   
+
 }
 
 - (void)setControlsEnabled:(BOOL)isEnabled
@@ -99,7 +98,7 @@
         //    [userLable setStringValue:@"Currently not working with protected profiles."];
         
         if ([rememberCheckBox state] == CPOnState)
-            [[LPCookieController shared=CookieController] setValue:[userTextField stringValue] forKey:@"screenname"];
+            [[LPCookieController sharedCookieController] setValue:[userTextField stringValue] forKey:@"screenname"];
             
         [[[CPApplication sharedApplication] delegate] applicationDidFinishLogin:[userTextField stringValue]];
 	}
