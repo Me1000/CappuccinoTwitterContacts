@@ -5,7 +5,7 @@
 @import <EKActivityIndicatorView/EKActivityIndicatorView.j>
 
 
-@implementation CPAConctactsViewController : CPViewController
+@implementation TWConctactsViewController : CPViewController
 {
     CPString                screenname;
     id                      currentCursor;
@@ -55,8 +55,8 @@
 	[headerView setColor1:[CPColor colorWithRed:51.0/255.0 green:51.0/255.0 blue:51.0/255.0 alpha:1.0]];
 	[contentView addSubview:headerView];
 
-	var iconView = [[CPImageView alloc] initWithFrame:CGRectMake(5,6,59,61)];
-	var iconPath = [[CPBundle mainBundle] pathForResource:@"TweetContacts.png"];
+	var iconView = [[CPImageView alloc] initWithFrame:CGRectMake(5,6,59,61)],
+	    iconPath = [[CPBundle mainBundle] pathForResource:@"TweetContacts.png"];
 	[iconView setImage:[[CPImage alloc] initWithContentsOfFile:iconPath]];
 	[headerView addSubview:iconView];
 	
@@ -210,7 +210,6 @@
     [theTableView setUsesAlternatingRowBackgroundColors:YES];
     [theTableView setColumnAutoresizingStyle:CPTableViewUniformColumnAutoresizingStyle];
     var column = [[CPTableColumn alloc] initWithIdentifier:"0"];
-    //[[column headerView] setStringValue:"Name"];
     [column setWidth:220-20];
     [column setResizingMask:CPTableColumnAutoresizingMask];
     [theTableView addTableColumn:column];
@@ -241,24 +240,21 @@
 
 }
 
-- (void) viewDidLoad
-{
-}
-
 - (void)loadContacts
 {
     if (statusBarHidden)
         [self setStatusBarHidden:NO];
         
-    var url = "http://api.twitter.com/1/statuses/friends.json?screen_name="+screenname+"&cursor="+currentCursor; 
-	var request = [CPURLRequest requestWithURL: url];
-    var connection = [CPJSONPConnection sendRequest:request callback:"callback" delegate:self];
+    var url = "http://api.twitter.com/1/statuses/friends.json?screen_name="+screenname+"&cursor="+currentCursor,
+	    request = [CPURLRequest requestWithURL: url],
+        connection = [CPJSONPConnection sendRequest:request callback:"callback" delegate:self];
    
 }
 
 - (void)setStatusBarHidden:(BOOL)flag
 {
     statusBarHidden = flag;
+
     if (statusBarHidden)
         [activityIndicator stopAnimating];
     else
@@ -312,38 +308,43 @@
     window.open(anURL, "_blank", "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=no");
 }
 
-- (void)setItems:(JSObject)myJSObject {
-	if (myJSObject) {
-        if(myJSObject.next_cursor) {
+- (void)setItems:(JSObject)myJSObject
+{
+	if (myJSObject)
+    {
+        if(myJSObject.next_cursor)
+        {
             currentCursor = myJSObject.next_cursor;
             [self loadContacts];
-        } else {
-            [self setStatusBarHidden:YES];
         }
+        else
+            [self setStatusBarHidden:YES];
 		
-        //console.log(myJSObject);
-		for(var i=0,count=myJSObject.users.length; i<count; i++)
+		for(var i = 0, count = myJSObject.users.length; i < count; i++)
 		{
-			var item = myJSObject.users[i];
+			var item = myJSObject.users[i].
+    		    nameComponents = [item.name componentsSeparatedByString:" "].
+    		    lastComponent,// = [[nameComponents lastObject] uppercaseString];
+    		    firstLetter;// = [lastComponent substringToIndex:1];
     		
-    		var nameComponents = [item.name componentsSeparatedByString:" "];
-    		var lastComponent;// = [[nameComponents lastObject] uppercaseString];
-    		var firstLetter;// = [lastComponent substringToIndex:1];
-    		
-    		for (var nameComponentIndex=[nameComponents count]-1; nameComponentIndex>=0; nameComponentIndex--)
+    		for (var nameComponentIndex = [nameComponents count] - 1; nameComponentIndex >= 0; nameComponentIndex--)
     		{
                 lastComponent = [[nameComponents objectAtIndex:nameComponentIndex] uppercaseString];
                 firstLetter = [lastComponent substringToIndex:1];
+
                 var rangeInAlphabet = [@"ABCDEFGHIJKLMNOPQRSTUVWXYZ" rangeOfString:firstLetter];
-                if (rangeInAlphabet.location == CPNotFound && nameComponentIndex == 0)
+
+                if (rangeInAlphabet.location === CPNotFound && nameComponentIndex === 0)
                     firstLetter = "•";
-                else if (rangeInAlphabet.location != CPNotFound)
+                else if (rangeInAlphabet.location !== CPNotFound)
                     break;
             }
     		  
     		var aGroup = [sortedDict objectForKey:firstLetter];
-    		if (!aGroup) {
-                 aGroup = [CPMutableArray array];
+
+    		if (!aGroup)
+            {
+                 aGroup = [];
                  [sortedDict setObject:aGroup forKey:firstLetter];
             }
             
@@ -354,44 +355,58 @@
             
 		}
 		
-		[self reloadData]
+		[self reloadData];
 	}
 }
 
 - (void)reloadData
 {
-    var isSearching = ([searchTextField stringValue] != "");
-    var searchString = [[searchTextField stringValue] uppercaseString];
-    var nameDescriptor = [[CPSortDescriptor alloc] initWithKey:@"lastComponent" ascending:YES];
-    var sortDescriptors = [CPArray arrayWithObject:nameDescriptor];
-    var aSortedArray = [CPMutableArray array];
-    var allKeys = [[sortedDict allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    var isSearching = ([searchTextField stringValue] !== ""),
+        searchString = [[searchTextField stringValue] uppercaseString],
+        nameDescriptor = [[CPSortDescriptor alloc] initWithKey:@"lastComponent" ascending:YES],
+        sortDescriptors = [CPArray arrayWithObject:nameDescriptor],
+        aSortedArray = [ ],
+        allKeys = [[sortedDict allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:),
+        i = 0,
+        c = [allKeys count];
     
-    for(var i=0; i<[allKeys count]; i++)
+    for(; i < c; i++)
     {
         var firstLetter = [allKeys objectAtIndex:i];
-        if (!firstLetter) {
-            console.log("WTF? i=="+i+" [allKeys count]=="+[allKeys count]);
+
+        if (!firstLetter)
+        {
+            [allKeys removeObjectAtIndex:i];
+            //console.log("WTF? i=="+i+" [allKeys count]=="+[allKeys count], allKeys);
             continue;
         }
-        var aGroup = [sortedDict objectForKey:firstLetter];
-        var aSortedGroupd = [aGroup sortedArrayUsingDescriptors:sortDescriptors];
-        var groupStartPosition = [aSortedArray count];
-        var isGroupEmpty = YES;
+        var aGroup = [sortedDict objectForKey:firstLetter],
+            aSortedGroupd = [aGroup sortedArrayUsingDescriptors:sortDescriptors],
+            groupStartPosition = [aSortedArray count],
+            isGroupEmpty = YES,
+            groupIndex = 0,
+            groupCount = [aSortedGroupd count];
             
-        for(var groupIndex=0; groupIndex<[aSortedGroupd count]; groupIndex++)
+        for(; groupIndex < groupCount; groupIndex++)
         {
             var item = [aSortedGroupd objectAtIndex:groupIndex];
-            if (isSearching) {
+
+            if (isSearching)
+            {
                 var uppercaseName = [item objectForKey:@"uppercaseName"];
-                if (!uppercaseName) {
+
+                if (!uppercaseName)
+                {
                     uppercaseName = [[item objectForKey:@"data"].name uppercaseString];
                     [item setObject:uppercaseName forKey:@"uppercaseName"];
                 }
+
                 var range = [uppercaseName rangeOfString:searchString];
-                if (range.location == CPNotFound)
+
+                if (range.location === CPNotFound)
                     continue;
             }
+
             [aSortedArray addObject:item];
             isGroupEmpty = NO;
         }
@@ -415,17 +430,12 @@
 
 - (id)tableView:(CPTableView)tableView objectValueForTableColumn:(CPTableColumn)tableColumn row:(int)row
 {
-    if ([tableColumn identifier] == "0") {
-        var item = [dataSourceRows objectAtIndex:row];
-        if ([item isMemberOfClass:[CPString class]]) {
-            return item;
-        } else {
-            return [item objectForKey:"data"].name;    
-        }
-	} else {
-		return "WRONG";
-	}
-	
+    var item = [dataSourceRows objectAtIndex:row];
+
+    if ([item isMemberOfClass:[CPString class]])
+        return item;
+    else
+        return [item objectForKey:"data"].name;
 }
 
 - (BOOL)tableView:(CPTableView)aTableView isGroupRow:(int)row
@@ -445,77 +455,89 @@
 - (void)tableViewSelectionDidChange:(CPNotification)aNotification
 {
     var row = [[theTableView selectedRowIndexes] firstIndex];
-    if (row != CPNotFound)
+
+    if (row !== CPNotFound)
     {
         var item = [[dataSourceRows objectAtIndex:row] objectForKey:"data"];
         
-        
+
         var anAvatarImage = [[CPImage alloc] initWithContentsOfFile:item.profile_image_url];
         [anAvatarImage setDelegate:self];
-        if ([anAvatarImage loadStatus] == CPImageLoadStatusCompleted)
+
+        if ([anAvatarImage loadStatus] === CPImageLoadStatusCompleted)
             [avatarImageView setImage:anAvatarImage];
         else
             [avatarImageView setImage:nil];
+
         avatarImage = anAvatarImage;
-        
+
         [nameTextField setStringValue:item.name];
         [screennameTextField setTitle:"@"+item.screen_name];
         [screennameTextField sizeToFit];
-        
+
+
         if (item.location)
             [locationTextField setStringValue:item.location];
         else
             [locationTextField setStringValue:@"-"];
-        
-        if (item.url) {
+
+
+        if (item.url)
+        {
             [urlTextField setTitle:item.url];
             [urlTextField sizeToFit];
-        } else {
-            [urlTextField setTitle:@"-"];
         }
+        else
+            [urlTextField setTitle:@"-"];
+
+
         [urlTextField setEnabled:(item.url)];
-        
+
         var text = (item.description) ? item.description : @"-";
         [descriptionTextField setStringValue:text];
-        var aSize1 = [text sizeWithFont:[descriptionTextField font] inWidth:200];
-        var aFrame1 = [descriptionTextField frame];
+
+        var aSize1 = [text sizeWithFont:[descriptionTextField font] inWidth:200],
+            aFrame1 = [descriptionTextField frame];
+
         aSize1.height += 10;
         aFrame1.size = aSize1;
         [descriptionTextField setFrame:aFrame1];
         
         text = (item.status) ? item.status.text : @"";
         [tweetTextField setStringValue:text];
-        var aSize2 = [text sizeWithFont:[tweetTextField font] inWidth:280];
-        var aFrame2 = [tweetTextField frame];
+
+        var aSize2 = [text sizeWithFont:[tweetTextField font] inWidth:280],
+            aFrame2 = [tweetTextField frame];
+
         aSize2.height += 10;
         aFrame2.size = aSize2;
         aFrame2.origin.y = aFrame1.origin.y + aFrame1.size.height + 20;
         [tweetTextField setFrame:aFrame2];
     }
-    else
+
+    
+    if ([rightView isHidden] !== (row === CPNotFound))
     {
-    
-    }
-    
-    if ([rightView isHidden] != (row == CPNotFound)) {
         var animation = [[CPViewAnimation alloc] initWithViewAnimations:[
             [CPDictionary dictionaryWithJSObject:{
                 CPViewAnimationTargetKey:rightView, 
-                CPViewAnimationEffectKey: (row == CPNotFound) ? CPViewAnimationFadeOutEffect : CPViewAnimationFadeInEffect
+                CPViewAnimationEffectKey: (row === CPNotFound) ? CPViewAnimationFadeOutEffect : CPViewAnimationFadeInEffect
             }],
         ]];
+
         [animation setAnimationCurve:CPAnimationLinear];
         [animation setDuration:0.3];
         [animation startAnimation];
 	
-        [rightView setHidden:(row == CPNotFound)];
+        [rightView setHidden:(row === CPNotFound)];
     }
 }
 
-/* CPURLConnection Delegate */
+/* CPURLConnection Delegate JOSNP style*/
 
-- (void)connection:(CPURLConnection)aConnection didReceiveData:(CPString)data {
-	var myJSObject = data;//JSON.parse(data);
+- (void)connection:(CPURLConnection)aConnection didReceiveData:(CPString)data
+{
+	var myJSObject = data;
 	
 	if (myJSObject)
 		[self setItems:myJSObject];
@@ -526,41 +548,33 @@
     [self loadContacts];
 }
 
-- (void)connectionDidFinishLoading:(CPURLConnection)aConnection {
-}
 
 /* CPSplitView Delegate */
 
 - (int)splitView:(CPSplitView)splitView constrainMinCoordinate:(int)minCoord ofSubviewAt:(int)index
 {
-    if (index == 0)
-    {
+    if (index === 0)
         return 200;
-    }
     else
-    {
         return minCoord;
-    }
 }
 
 - (int)splitView:(CPSplitView)splitView constrainMaxCoordinate:(int)minCoord ofSubviewAt:(int)index
 {
-    if (index == 0)
+    if (index === 0)
     {
         var rect = [[self view] frame];
         return rect.size.width / 2;
     }
     else
-    {
         return minCoord;
-    }
 }
 
 /* CPSplitView Delegate */
 
 - (void)imageDidLoad:(CPImage)anImage
 {
-    if (avatarImage == anImage)
+    if (avatarImage === anImage)
         [avatarImageView setImage:anImage];
 }
 
@@ -570,11 +584,6 @@
 {
     [theTableView deselectAll]
     [self reloadData];
-}
-
-- (void)controlTextDidEndEditing:(id)aTextField
-{
-
 }
 
 

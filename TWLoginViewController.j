@@ -5,7 +5,7 @@
 @import <EKActivityIndicatorView/EKActivityIndicatorView.j>
 
 
-@implementation CPALoginViewController : CPViewController
+@implementation TWLoginViewController : CPViewController
 {
     CPView                  loginView;
     CPTextField             userLable;
@@ -13,14 +13,6 @@
     EKActivityIndicatorView activityIndicator;
     CPCheckBox              rememberCheckBox;
     CPButton                preButton;
-}
-
-- (id)init
-{
-    if (self = [super init])
-    {
-    }
-    return self;
 }
 
 - (void)loadView
@@ -68,10 +60,12 @@
     [userTextField setEnabled:isEnabled];
     [rememberCheckBox setEnabled:isEnabled];
     [preButton setEnabled:isEnabled];
+
     if (!isEnabled)
         [activityIndicator startAnimating];
     else
         [activityIndicator stopAnimating];
+
     [activityIndicator setHidden:isEnabled];
 }
 
@@ -79,9 +73,9 @@
 {
     [self setControlsEnabled:NO];
     
-    var url = "http://api.twitter.com/1/users/show.json?screen_name="+[userTextField stringValue]; 
-	var request = [CPURLRequest requestWithURL: url];
-    var connection = [CPJSONPConnection sendRequest:request callback:"callback" delegate:self];
+    var url = "http://api.twitter.com/1/users/show.json?screen_name="+[userTextField stringValue],
+	    request = [CPURLRequest requestWithURL: url],
+        connection = [CPJSONPConnection sendRequest:request callback:"callback" delegate:self];
 }
 
 /* CPURLConnection Delegate */
@@ -92,8 +86,11 @@
     
 	//var myJSObject = JSON.parse(data);
 	var myJSObject = data;
-	if (myJSObject) {
-        if (myJSObject.error == "Not found") {
+
+	if (myJSObject)
+    {
+        if (myJSObject.error === "Not found")
+        {
             var animation = [[EKShakeAnimation alloc] initWithView:loginView];
             [userLable setStringValue:@"Couldn't find user."];
             return;
@@ -102,7 +99,7 @@
         //    [userLable setStringValue:@"Currently not working with protected profiles."];
         
         if ([rememberCheckBox state] == CPOnState)
-            [[LPCookieController sharedCookieController] setValue:[userTextField stringValue] forKey:@"screenname"];
+            [[LPCookieController shared=CookieController] setValue:[userTextField stringValue] forKey:@"screenname"];
             
         [[[CPApplication sharedApplication] delegate] applicationDidFinishLogin:[userTextField stringValue]];
 	}
@@ -111,14 +108,12 @@
 - (void)connection:(CPJSONPConnection)connection didFailWithError:(id)error
 {
     [self setControlsEnabled:YES];
-    
-    if (error == 404) 
+
+    // FIX ME: this isn't being called...
+    if (error === 404) 
         [userLable setStringValue:@"Couldn't find user."];
     else
         [userLable setStringValue:error];
-}
-
-- (void)connectionDidFinishLoading:(CPJSONPConnection)aConnection {
 }
 
 @end

@@ -9,15 +9,15 @@
 @import <Foundation/CPObject.j>
 
 @import <LPKit/LPKit.j>
-@import "CPALoginViewController.j"
-@import "CPAConctactsViewController.j"
+@import "TWLoginViewController.j"
+@import "TWConctactsViewController.j"
 
 @implementation AppController : CPObject
 {
     CPWindow theWindow;
     CPView contentView;
-    CPALoginViewController loginViewController;
-    CPALoginViewController conctactsViewController;
+    TWLoginViewController loginViewController;
+    TWLoginViewController conctactsViewController;
 }
 
 - (void)applicationDidFinishLaunching:(CPNotification)aNotification
@@ -27,7 +27,7 @@
     
     var screenname = [[LPCookieController sharedCookieController] valueForKey:@"screenname"];
     if (screenname) {
-        conctactsViewController = [[CPAConctactsViewController alloc] initWithScreenname:screenname];
+        conctactsViewController = [[TWConctactsViewController alloc] initWithScreenname:screenname];
 
         [[conctactsViewController view] setFrame:[contentView bounds]];
         [contentView addSubview:[conctactsViewController view]];
@@ -36,7 +36,7 @@
     }
     else
     {
-        loginViewController = [[CPALoginViewController alloc] init];
+        loginViewController = [[TWLoginViewController alloc] init];
 
         [[loginViewController view] setFrame:[contentView bounds]];
         [contentView addSubview:[loginViewController view]];
@@ -55,7 +55,7 @@
 
 - (void)applicationDidFinishLogin:(CPString)screenname
 {
-    conctactsViewController = [[CPAConctactsViewController alloc] initWithScreenname:screenname];
+    conctactsViewController = [[TWConctactsViewController alloc] initWithScreenname:screenname];
 
     [[conctactsViewController view] setFrame:[contentView bounds]];
     [contentView addSubview:[conctactsViewController view]];
@@ -82,7 +82,7 @@
 
 - (void)applicationDidFinishLogout
 {   
-    loginViewController = [[CPALoginViewController alloc] init];
+    loginViewController = [[TWLoginViewController alloc] init];
 
     [[loginViewController view] setFrame:[contentView bounds]];
     [contentView addSubview:[loginViewController view]];
